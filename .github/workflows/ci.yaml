@@ -1,0 +1,14 @@
+name: CI
+on:
+  push:
+    branches:
+      - main
+jobs:
+  build:
+    name: Build the toolchain using CMake
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Install GNU Arm Embedded Toolchain
+        uses: carlosperate/arm-none-eabi-gcc-action@v1
