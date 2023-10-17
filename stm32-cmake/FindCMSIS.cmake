@@ -4,7 +4,6 @@ endif ()
 
 set(CMSIS_ROOT_DIR "${stm32cube_SOURCE_DIR}/Drivers/CMSIS")
 set(CMSIS_DEVICE_ROOT_DIR "${CMSIS_ROOT_DIR}/Device/ST/${STM32_MCU_FAMILY}")
-string(TOLOWER ${STM32_MCU_SERIES} HAL_SERIES)
 
 set(CMSIS_INCLUDE_DIRS
         "${CMSIS_ROOT_DIR}/Include"
@@ -16,7 +15,7 @@ file(GLOB CMSIS_SOURCES
 
 # Append the startup source in assembler associated to the device family.
 set(CMSIS_STARTUP_SOURCE
-        "${CMSIS_DEVICE_ROOT_DIR}/Source/Templates/gcc/startup_${HAL_SERIES}.s")
+        "${CMSIS_DEVICE_ROOT_DIR}/Source/Templates/gcc/startup_${STM32_MCU_SERIES_L}.s")
 
 list(APPEND CMSIS_SOURCES ${CMSIS_STARTUP_SOURCE})
 

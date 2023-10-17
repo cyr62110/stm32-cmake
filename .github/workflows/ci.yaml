@@ -16,6 +16,6 @@ jobs:
         uses: threeal/cmake-action@v1.3.0
         with:
           generator: Unix Makefiles
-          options: CMAKE_TOOLCHAIN_FILE=cmake/stm32/toolchain/gcc.cmake
+          options: CMAKE_TOOLCHAIN_FILE=stm32-cmake/stm32/toolchain/gcc.cmake
       - name: Build the project
         run: cmake --build build

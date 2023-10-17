@@ -21,6 +21,31 @@ function(stm32_configure_and_check_toolchain)
     set(CMAKE_TRY_COMPILE_TARGET_TYPE "STATIC_LIBRARY" PARENT_SCOPE)
 endfunction()
 
+# Check if a HAL configuration file is present into provided target INCLUDE_DIRECTORIES.
+# Otherwise copy from template into output directory.
+function(stm32_check_or_generate_hal_config target output_directory)
+    if (NOT HAL_FOUND)
+        return()
+    endif ()
+
+    get_target_property(INCLUDE_DIRECTORIES ${target} INCLUDE_DIRECTORIES)
+    foreach (DIR IN LISTS INCLUDE_DIRECTORIES)
+        if (EXISTS "${DIR}/${HAL_CONFIG_FILENAME}")
+            set(EXISTING_HAL_CONFIG_FILE "${DIR}/${HAL_CONFIG_FILENAME}")
+            break()
+        endif ()
+    endforeach ()
+
+    if (EXISTING_HAL_CONFIG_FILE)
+        message(STATUS "Found existing HAL configuration ${EXISTING_HAL_CONFIG_FILE}")
+    else ()
+        set(TEMPLATE_INPUT_FILE "${HAL_ROOT_DIR}/Inc/${STM32_MCU_FAMILY_L}_hal_conf_template.h")
+        file(MAKE_DIRECTORY "${output_directory}")
+        file(COPY_FILE ${TEMPLATE_INPUT_FILE} "${output_directory}/${HAL_CONFIG_FILENAME}")
+        message(STATUS "Copied HAL configuration template to $${output_directory}/${HAL_CONFIG_FILENAME}")
+    endif ()
+endfunction()
+
 # Append the sources from the CMSIS and the HAL libraries to the provided sources lists.
 # Then output the appended list to the output_variable.
 function(stm32_configure_sources sources output_variable)
@@ -54,7 +79,7 @@ function(stm32_generate_additional_binary target target_bfdname)
     add_custom_command(
             TARGET ${target}
             POST_BUILD
-            COMMAND ${CMAKE_OBJCOPY} ${TARGET_INPUT_FILE} -O ${target_bfdname}  ${TARGET_OUTPUT_FILE}
+            COMMAND ${CMAKE_OBJCOPY} ${TARGET_INPUT_FILE} -O ${target_bfdname} ${TARGET_OUTPUT_FILE}
             BYPRODUCTS ${TARGET_OUTPUT_FILE}
             COMMENT "Generating ${target_bfdname} output ${TARGET_OUTPUT_FILENAME}.${OUTPUT_EXTENSION}"
     )

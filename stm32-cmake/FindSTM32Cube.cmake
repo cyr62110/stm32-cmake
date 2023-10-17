@@ -7,9 +7,11 @@
 #
 # Output variables:
 # - STM32_MCU: Name of the MCU.
-# - STM32_MCU_FAMILY: Family of the MCU: STM32F7xx
+# - STM32_MCU_FAMILY: Family of the MCU: ex. STM32F7xx
+# - STM32_MCU_FAMILY_L: Lower case version of STM32_MCU_FAMILY: ex. stm32f7xx
 # - STM32_MCU_SHORT_FAMILY: Short name of the MCU family: ex. F7
 # - STM32_MCU_SERIES: Series of the MCU: ex. STM32F767xx
+# - STM32_MCU_SERIES_L: Lower case version of STM32_MCU_SERIES: ex. stm32f767xx
 # - stm32cube_SOURCE_DIR: The directory where the STM32Cube associated to the MCU family is available.
 
 include(FetchContent)
@@ -23,6 +25,7 @@ endif ()
 string(TOUPPER ${STM32Cube_FIND_COMPONENTS} STM32_MCU)
 extract_stm32_short_family(${STM32_MCU} STM32_MCU_SHORT_FAMILY)
 compute_stm32_family(${STM32_MCU_SHORT_FAMILY} STM32_MCU_FAMILY)
+string(TOLOWER ${STM32_MCU_FAMILY} STM32_MCU_FAMILY_L)
 
 message(STATUS "MCU: ${STM32_MCU}")
 message(STATUS "MCU family: (${STM32_MCU_SHORT_FAMILY}) ${STM32_MCU_FAMILY}")
@@ -36,6 +39,7 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(STM32Cube)
 
 compute_stm32_mcu_series(${STM32_MCU} ${STM32_MCU_FAMILY} STM32_MCU_SERIES)
+string(TOLOWER ${STM32_MCU_SERIES} STM32_MCU_SERIES_L)
 message(STATUS "MCU series: ${STM32_MCU_SERIES}")
 
 # Export the compile & link options for the MCU.

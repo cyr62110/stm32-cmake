@@ -1,14 +1,9 @@
 # stm32-cmake
 Base project to build STM32 application using CMake and GCC toolchain.
 
-- [How to use this project](#how-to-use-this-project)
-- [Build your project](#build-your-project)
+## Requirements
 
-## How to use this project
-
-### CMakeLists.txt
-
-### Cross-compile toolchains
+- CMake 3.21 or greater
 
 ## Build your project
 
