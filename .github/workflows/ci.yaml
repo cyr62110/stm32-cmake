@@ -10,6 +10,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Cache CMake dependencies
+        uses: actions/cache@v3
+        with:
+          path: ./deps/*-src
       - name: Install GNU Arm Embedded Toolchain
         uses: carlosperate/arm-none-eabi-gcc-action@v1
       - name: Configure the project

@@ -42,7 +42,7 @@ function(stm32_check_or_generate_hal_config target output_directory)
         set(TEMPLATE_INPUT_FILE "${HAL_ROOT_DIR}/Inc/${STM32_MCU_FAMILY_L}_hal_conf_template.h")
         file(MAKE_DIRECTORY "${output_directory}")
         file(COPY_FILE ${TEMPLATE_INPUT_FILE} "${output_directory}/${HAL_CONFIG_FILENAME}")
-        message(STATUS "Copied HAL configuration template to $${output_directory}/${HAL_CONFIG_FILENAME}")
+        message(STATUS "Copied HAL configuration template to ${output_directory}/${HAL_CONFIG_FILENAME}")
     endif ()
 endfunction()
 
