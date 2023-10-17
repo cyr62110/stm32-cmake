@@ -42,11 +42,6 @@ int main(void)
     // 1kHz ticks
     HAL_SYSTICK_Config(SystemCoreClock / 1000);
 
-    while(1) {
-        HAL_GPIO_WritePin(LED_PORT, LED_PIN, GPIO_PIN_SET);
-        HAL_Delay(1000);
-        HAL_GPIO_WritePin(LED_PORT, LED_PIN, GPIO_PIN_RESET);
-        HAL_Delay(1000);
-    }
+    while(1) {}
     return 0;
 }

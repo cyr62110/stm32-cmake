@@ -16,9 +16,9 @@ include(FetchContent)
 include(stm32/families)
 include(stm32/series)
 
-if("${STM32Cube_FIND_COMPONENTS}" STREQUAL "")
+if ("${STM32Cube_FIND_COMPONENTS}" STREQUAL "")
     message(FATAL_ERROR "Usage: find_package(STM32Cube COMPONENTS <MCU family>)")
-endif()
+endif ()
 
 string(TOUPPER ${STM32Cube_FIND_COMPONENTS} STM32_MCU)
 extract_stm32_short_family(${STM32_MCU} STM32_MCU_SHORT_FAMILY)
@@ -29,9 +29,9 @@ message(STATUS "MCU family: (${STM32_MCU_SHORT_FAMILY}) ${STM32_MCU_FAMILY}")
 
 # Download the SMT32Cube from Git repositories.
 FetchContent_Declare(
-    STM32Cube
-    GIT_REPOSITORY "https://github.com/STMicroelectronics/STM32Cube${STM32_MCU_SHORT_FAMILY}"
-    EXCLUDE_FROM_ALL
+        STM32Cube
+        GIT_REPOSITORY "https://github.com/STMicroelectronics/STM32Cube${STM32_MCU_SHORT_FAMILY}"
+        EXCLUDE_FROM_ALL
 )
 FetchContent_MakeAvailable(STM32Cube)
 

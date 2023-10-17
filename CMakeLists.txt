@@ -1,10 +1,10 @@
-cmake_minimum_required(VERSION 3.16)
+cmake_minimum_required(VERSION 3.20)
 set(CMAKE_VERBOSE_MAKEFILE on)
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 
 include(${CMAKE_MODULE_PATH}/stm32.cmake)
 
-set(PROJECT_NAME openinkslate)
+set(PROJECT_NAME stm32cmake)
 
 stm32_configure_and_check_toolchain()
 project(${PROJECT_NAME} C CXX ASM)
