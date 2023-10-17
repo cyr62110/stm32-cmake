@@ -12,3 +12,9 @@ jobs:
         uses: actions/checkout@v4
       - name: Install GNU Arm Embedded Toolchain
         uses: carlosperate/arm-none-eabi-gcc-action@v1
+      - name: Configure the project
+        uses: threeal/cmake-action@v1.3.0
+        with:
+          options: -DCMAKE_TOOLCHAIN_FILE=cmake/stm32/toolchain/gcc.cmake
+      - name: Build the project
+        run: cmake --build build
