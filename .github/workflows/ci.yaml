@@ -14,7 +14,7 @@ jobs:
         uses: actions/cache@v3
         with:
           key: cmake-deps
-          path: ./_deps/*-src
+          path: _deps/*-src
       - name: Install GNU Arm Embedded Toolchain
         uses: carlosperate/arm-none-eabi-gcc-action@v1
       - name: Configure the project
