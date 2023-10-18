@@ -4,17 +4,6 @@ include(stm32/utils)
 # And configure some options to avoid common issues with cross-compilation toolchain.
 # MUST BE CALLED BEFORE THE project() in your CMakeLists.
 function(stm32_configure_and_check_toolchain)
-    file(REAL_PATH ${CMAKE_MODULE_PATH}/stm32/toolchain/gcc.cmake EXPECTED_TOOLCHAIN_FILE)
-
-    if ("${CMAKE_TOOLCHAIN_FILE}" STREQUAL "")
-        message(FATAL_ERROR "Set CMAKE_TOOLCHAIN_FILE environment variable to: ${EXPECTED_TOOLCHAIN_FILE}")
-    endif ()
-
-    file(REAL_PATH ${CMAKE_TOOLCHAIN_FILE} TOOLCHAIN_FILE)
-    if (NOT ${TOOLCHAIN_FILE} STREQUAL ${EXPECTED_TOOLCHAIN_FILE})
-        message(FATAL_ERROR "Change CMAKE_TOOLCHAIN_FILE environment variable to: ${EXPECTED_TOOLCHAIN_FILE}")
-    endif ()
-
     # Change the type executable cmake uses to test if the toolchain is working.
     # Mandatory because the cross-toolchain is missing some functions like printf.
     # https://stackoverflow.com/questions/53633705/cmake-the-c-compiler-is-not-able-to-compile-a-simple-test-program
