@@ -1,3 +1,7 @@
+# CLion generated directory
+
+cmake-build-debug
+
 # Directories containing generated binaries
 
 generated_sources
