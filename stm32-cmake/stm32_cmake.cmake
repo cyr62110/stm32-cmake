@@ -1,3 +1,5 @@
+include(stm32/hal)
+include(stm32/linker)
 include(stm32/utils)
 
 # Check the cross compilation toolchain is properly configured.
@@ -8,31 +10,6 @@ function(stm32_configure_and_check_toolchain)
     # Mandatory because the cross-toolchain is missing some functions like printf.
     # https://stackoverflow.com/questions/53633705/cmake-the-c-compiler-is-not-able-to-compile-a-simple-test-program
     set(CMAKE_TRY_COMPILE_TARGET_TYPE "STATIC_LIBRARY" PARENT_SCOPE)
-endfunction()
-
-# Check if a HAL configuration file is present into provided target INCLUDE_DIRECTORIES.
-# Otherwise copy from template into output directory.
-function(stm32_check_or_generate_hal_config target output_directory)
-    if (NOT HAL_FOUND)
-        return()
-    endif ()
-
-    get_target_property(INCLUDE_DIRECTORIES ${target} INCLUDE_DIRECTORIES)
-    foreach (DIR IN LISTS INCLUDE_DIRECTORIES)
-        if (EXISTS "${DIR}/${HAL_CONFIG_FILENAME}")
-            set(EXISTING_HAL_CONFIG_FILE "${DIR}/${HAL_CONFIG_FILENAME}")
-            break()
-        endif ()
-    endforeach ()
-
-    if (EXISTING_HAL_CONFIG_FILE)
-        message(STATUS "Found existing HAL configuration ${EXISTING_HAL_CONFIG_FILE}")
-    else ()
-        set(TEMPLATE_INPUT_FILE "${HAL_ROOT_DIR}/Inc/${STM32_MCU_FAMILY_L}_hal_conf_template.h")
-        file(MAKE_DIRECTORY "${output_directory}")
-        file(COPY_FILE ${TEMPLATE_INPUT_FILE} "${output_directory}/${HAL_CONFIG_FILENAME}")
-        message(STATUS "Copied HAL configuration template to ${output_directory}/${HAL_CONFIG_FILENAME}")
-    endif ()
 endfunction()
 
 # Append the sources from the CMSIS and the HAL libraries to the provided sources lists.
@@ -74,10 +51,10 @@ function(stm32_generate_additional_binary target target_bfdname)
     )
 endfunction()
 
-# Configure the compile & linker options.
+# Add compile & linker options to compile a target for the architecture.
 function(stm32_configure_target target)
-    # Add C define with the series of the target.
-    target_compile_definitions(${target} PUBLIC "${STM32_MCU_SERIES}")
+    # Add C define with the line of the target.
+    target_compile_definitions(${target} PUBLIC "${STM32_MCU_LINE_U}")
 
     target_compile_options(${target}
             PUBLIC -Wall
@@ -97,6 +74,19 @@ function(stm32_configure_target target)
     # Configure the compile & linked options for the MCU declared in find_package(STM32Cube COMPONENTS <MCU>)
     target_compile_options(${target} PUBLIC ${STM32_COMPILE_OPTIONS})
     target_link_options(${target} PUBLIC ${STM32_LINK_OPTIONS})
+endfunction()
+
+# Configure the executable target by doing the following operation depending on whether the CMSIS and/or HAL are linked:
+# - Add the compile & linker options to target the architecture.
+# - [CMSIS & HAL] Add include directories for the library if it is included.
+# - [HAL] Check if the configuration header is present or use one from t
+function(stm32_configure_executable target)
+    stm32_configure_target(${target})
+    stm32_configure_hal_config(${target})
+    stm32_configure_linker_script(${target})
+
+    # Add headers that may have been generated from templates (ex. HAL config).
+    target_include_directories(${target} PUBLIC ${STM32_GENERATED_OUTPUT_DIR})
 
     # Add postcompile commands to generate .hex & .bin files used for programming.
     stm32_generate_additional_binary(${target} ihex)
