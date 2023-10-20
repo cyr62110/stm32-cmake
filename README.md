@@ -1,5 +1,8 @@
 # stm32-cmake
-Base project to build STM32 application using CMake and GCC toolchain.
+Base project to build STM32 application using [CMake](https://cmake.org/) and GCC toolchain.
+
+This project is designed to work with a single microcontroller for a project.
+Changing the microcontroller requires to regenerate your Makefiles.
 
 ## Requirements
 

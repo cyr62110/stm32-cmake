@@ -1,31 +1,105 @@
-function(stm32_get_linker_info
-        flash_origin_output_var
-        flash_size_output_var
-        ram_origin_output_var
-        ram_size_output_var
-)
+include(stm32/device)
 
-    # TODO
+function(stm32_generic_get_linker_info
+        linker_info
+        size_output_var
+        origin_output_var
+)
+    # Flash
+    if (linker_info STREQUAL "FLASH")
+        stm32_get_flash_size(FLASH_SIZE)
+        if (FLASH_SIZE)
+            set(${size_output_var} ${FLASH_SIZE} PARENT_SCOPE)
+            set(${origin_output_var} 0x08000000 PARENT_SCOPE)
+        endif ()
+        return()
+    endif ()
+
+    # RAM
+    if (linker_info STREQUAL "RAM")
+        stm32_lookup_device_info(RAM RAM_SIZE)
+        if (RAM_SIZE)
+            set(${size_output_var} ${RAM_SIZE} PARENT_SCOPE)
+            set(${origin_output_var} 0x20000000 PARENT_SCOPE)
+        endif ()
+    endif ()
+
+    # TODO: CCRAM - ORIGIN 0x10000000
+    # TODO: Shared RAM - ORIGIN 0x20030000
+
+    # Heap
+    if (linker_info STREQUAL "HEAP")
+        stm32_get_linker_info("RAM" RAM_SIZE _)
+        if (RAM_SIZE STREQUAL "2K")
+            set(${size_output_var} 0x100 PARENT_SCOPE)
+        else ()
+            set(${size_output_var} 0x200 PARENT_SCOPE)
+        endif ()
+    endif ()
+
+    # Stack
+    if (linker_info STREQUAL "STACK")
+        stm32_get_linker_info("RAM" RAM_SIZE _)
+        if (RAM_SIZE STREQUAL "2K")
+            set(${size_output_var} 0x200 PARENT_SCOPE)
+        else ()
+            set(${size_output_var} 0x400 PARENT_SCOPE)
+        endif ()
+    endif ()
+
+endfunction()
+
+function(stm32_get_linker_info
+        linker_info
+        size_output_var
+        origin_output_var
+)
+    # TODO: Check if it exists a specific function of this function for series, line, MCU.
+    # TODO: In this case, use this specific function.
+
+    stm32_generic_get_linker_info(${linker_info} GENERIC_SIZE GENERIC_ORIGIN)
+
+    if (GENERIC_SIZE)
+        set(${size_output_var} ${GENERIC_SIZE} PARENT_SCOPE)
+    endif ()
+
+    if (GENERIC_ORIGIN)
+        set(${origin_output_var} ${GENERIC_ORIGIN} PARENT_SCOPE)
+    endif ()
 endfunction()
 
 function(stm32_generate_linker_script)
     set(LINKER_FILE "${STM32_GENERATED_OUTPUT_DIR}/${STM32_MCU}.ld")
 
-    # stm32_get_linker_info()
+    stm32_get_linker_info("FLASH" FLASH_SIZE FLASH_ORIGIN)
+    if (NOT FLASH_SIZE OR NOT FLASH_ORIGIN)
+        message(FATAL_ERROR "Unable to determine Flash size and/or origin to generate linker script for ${STM32_MCU}.")
+    endif ()
+
+    stm32_get_linker_info("RAM" RAM_SIZE RAM_ORIGIN)
+    if (NOT RAM_SIZE OR NOT RAM_ORIGIN)
+        message(FATAL_ERROR "Unable to determine RAM size and/or origin to generate linker script for ${STM32_MCU}.")
+    endif ()
+
+    stm32_get_linker_info("HEAP" HEAP_SIZE _)
+    stm32_get_linker_info("STACK" STACK_SIZE _)
+    if (NOT HEAP_SIZE OR NOT STACK_SIZE)
+        message(FATAL_ERROR "Unable to determine stack and/or heap size to generate linker script for ${STM32_MCU}.")
+    endif ()
 
     file(WRITE ${LINKER_FILE} "ENTRY(Reset_Handler)\n")
     file(APPEND ${LINKER_FILE} "\n")
 
     # Highest address of the user mode stack: End of RAM
     file(APPEND ${LINKER_FILE} "_estack = ORIGIN(RAM) + LENGTH(RAM);\n")
-    file(APPEND ${LINKER_FILE} "_Min_Heap_Size = 0x200;\n") # TODO
-    file(APPEND ${LINKER_FILE} "_Min_Stack_Size = 0x400;\n") # TODO
+    file(APPEND ${LINKER_FILE} "_Min_Heap_Size = ${HEAP_SIZE};\n")
+    file(APPEND ${LINKER_FILE} "_Min_Stack_Size = ${STACK_SIZE};\n")
     file(APPEND ${LINKER_FILE} "\n")
 
     # Specify the memory areas
     file(APPEND ${LINKER_FILE} "MEMORY {\n")
-    file(APPEND ${LINKER_FILE} "RAM (rwx) : ORIGIN = 0x20000000, LENGTH = 512K\n") # TODO
-    file(APPEND ${LINKER_FILE} "FLASH (rx) : ORIGIN = 0x8000000, LENGTH = 2048K\n") # TODO
+    file(APPEND ${LINKER_FILE} "RAM (rwx) : ORIGIN = ${RAM_ORIGIN}, LENGTH = ${RAM_SIZE}\n")
+    file(APPEND ${LINKER_FILE} "FLASH (rx) : ORIGIN = ${FLASH_ORIGIN}, LENGTH = ${FLASH_SIZE}\n")
     file(APPEND ${LINKER_FILE} "}\n")
     file(APPEND ${LINKER_FILE} "\n")
 
