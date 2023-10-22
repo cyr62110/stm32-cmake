@@ -22,6 +22,6 @@ target_include_directories(${CMSIS_TARGET}
         INTERFACE "${CMSIS_ROOT_DIR}/Include"
         INTERFACE "${CMSIS_ROOT_DIR}/Device/ST/${STM32_MCU_SERIES_U}/Include")
 
-stm32_configure_target(${CMSIS_TARGET})
+stm32_configure_target(INTERFACE ${CMSIS_TARGET})
 
 set(CMSIS_FOUND 1)

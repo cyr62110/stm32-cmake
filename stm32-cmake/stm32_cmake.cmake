@@ -52,28 +52,29 @@ function(stm32_generate_additional_binary target target_bfdname)
 endfunction()
 
 # Add compile & linker options to compile a target for the architecture.
-function(stm32_configure_target target)
+# The scope is INTERFACE, PUBLIC and PRIVATE.
+function(stm32_configure_target scope target)
     # Add C define with the line of the target.
-    target_compile_definitions(${target} INTERFACE "${STM32_MCU_LINE_U}")
+    target_compile_definitions(${target} ${scope} "${STM32_MCU_LINE_U}")
 
     target_compile_options(${target}
-            INTERFACE -Wall
-            INTERFACE -fdata-sections
-            INTERFACE -ffunction-sections)
+            ${scope} -Wall
+            ${scope} -fdata-sections
+            ${scope} -ffunction-sections)
 
     # Add linker flags indicating we are running on baremetal
     target_link_options(${target}
-            INTERFACE -lnosys
-            INTERFACE --specs=nosys.specs)
+            ${scope} -lnosys
+            ${scope} --specs=nosys.specs)
 
     # Link with standard libraries: C, math.h
     target_link_options(${target}
-            INTERFACE -lc
-            INTERFACE -lm)
+            ${scope} -lc
+            ${scope} -lm)
 
     # Configure the compile & linked options for the MCU declared in find_package(STM32Cube COMPONENTS <MCU>)
-    target_compile_options(${target} INTERFACE ${STM32_COMPILE_OPTIONS})
-    target_link_options(${target} INTERFACE ${STM32_LINK_OPTIONS})
+    target_compile_options(${target} ${scope} ${STM32_COMPILE_OPTIONS})
+    target_link_options(${target} ${scope} ${STM32_LINK_OPTIONS})
 endfunction()
 
 # Configure the executable target by doing the following operation depending on whether the CMSIS and/or HAL are linked:
@@ -81,7 +82,7 @@ endfunction()
 # - [CMSIS & HAL] Add include directories for the library if it is included.
 # - [HAL] Check if the configuration header is present or use one from t
 function(stm32_configure_executable target)
-    stm32_configure_target(${target})
+    stm32_configure_target(PUBLIC ${target})
     stm32_configure_hal_config(${target})
     stm32_configure_linker_script(${target})
 

@@ -22,6 +22,6 @@ add_library(${HAL_TARGET} INTERFACE ${HAL_SOURCES})
 target_include_directories(${CMSIS_TARGET}
         INTERFACE "${HAL_ROOT_DIR}/Inc")
 
-stm32_configure_target(${HAL_TARGET})
+stm32_configure_target(INTERFACE ${HAL_TARGET})
 
 set(HAL_FOUND 1)
