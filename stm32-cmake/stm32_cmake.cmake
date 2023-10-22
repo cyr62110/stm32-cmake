@@ -53,7 +53,7 @@ endfunction()
 
 # Add compile & linker options to compile a target for the architecture.
 # The scope is INTERFACE, PUBLIC and PRIVATE.
-function(stm32_configure_target scope target)
+function(stm32_configure_target target scope)
     # Add C define with the line of the target.
     target_compile_definitions(${target} ${scope} "${STM32_MCU_LINE_U}")
 
@@ -82,8 +82,7 @@ endfunction()
 # - [CMSIS & HAL] Add include directories for the library if it is included.
 # - [HAL] Check if the configuration header is present or use one from t
 function(stm32_configure_executable target)
-    stm32_configure_target(PUBLIC ${target})
-    stm32_configure_hal_config(${target})
+    stm32_configure_target(${target} PUBLIC)
     stm32_configure_linker_script(${target})
 
     # Add headers that may have been generated from templates (ex. HAL config).
@@ -96,12 +95,12 @@ function(stm32_configure_executable target)
 
     # Configure the CMSIS if find_package(CMSIS) has been called and the CMSIS has been found.
     if (${CMSIS_FOUND} EQUAL 1)
-        target_link_libraries(${PROJECT_NAME} ${CMSIS_TARGET})
+        target_link_libraries(${target} ${CMSIS_TARGET})
     endif ()
 
     # Configure the HAL if find_package(HAL) has been called and the HAL has been found.
     if (${HAL_FOUND} EQUAL 1)
-        target_compile_definitions(${target} PUBLIC "USE_HAL_DRIVER")
-        target_link_libraries(${PROJECT_NAME} ${HAL_TARGET})
+        stm32_configure_hal_config(${HAL_TARGET} INTERFACE)
+        target_link_libraries(${target} ${HAL_TARGET})
     endif ()
 endfunction()

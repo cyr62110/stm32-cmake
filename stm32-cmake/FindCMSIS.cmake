@@ -15,13 +15,13 @@ set(CMSIS_STARTUP_SOURCE "${CMSIS_DEVICE_ROOT_DIR}/Source/Templates/gcc/startup_
 file(GLOB CMSIS_SOURCES "${CMSIS_DEVICE_ROOT_DIR}/Source/Templates/*.c")
 list(APPEND CMSIS_SOURCES ${CMSIS_STARTUP_SOURCE})
 
-add_library(${CMSIS_TARGET} ${CMSIS_SOURCES})
+add_library(${CMSIS_TARGET} INTERFACE ${CMSIS_SOURCES})
 
 # Include generic headers and headers specific to the MCU series.
 target_include_directories(${CMSIS_TARGET}
-        PUBLIC "${CMSIS_ROOT_DIR}/Include"
-        PUBLIC "${CMSIS_ROOT_DIR}/Device/ST/${STM32_MCU_SERIES_U}/Include")
+        INTERFACE "${CMSIS_ROOT_DIR}/Include"
+        INTERFACE "${CMSIS_ROOT_DIR}/Device/ST/${STM32_MCU_SERIES_U}/Include")
 
-stm32_configure_target(PRIVATE ${CMSIS_TARGET})
+stm32_configure_target(${CMSIS_TARGET} INTERFACE)
 
 set(CMSIS_FOUND 1)
