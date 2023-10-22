@@ -54,26 +54,26 @@ endfunction()
 # Add compile & linker options to compile a target for the architecture.
 function(stm32_configure_target target)
     # Add C define with the line of the target.
-    target_compile_definitions(${target} PUBLIC "${STM32_MCU_LINE_U}")
+    target_compile_definitions(${target} INTERFACE "${STM32_MCU_LINE_U}")
 
     target_compile_options(${target}
-            PUBLIC -Wall
-            PUBLIC -fdata-sections
-            PUBLIC -ffunction-sections)
-
-    # Link with standard libraries: C, math.h
-    target_link_options(${target}
-            PUBLIC -lc
-            PUBLIC -lm)
+            INTERFACE -Wall
+            INTERFACE -fdata-sections
+            INTERFACE -ffunction-sections)
 
     # Add linker flags indicating we are running on baremetal
     target_link_options(${target}
-            PUBLIC -lnosys
-            PUBLIC --specs=nosys.specs)
+            INTERFACE -lnosys
+            INTERFACE --specs=nosys.specs)
+
+    # Link with standard libraries: C, math.h
+    target_link_options(${target}
+            INTERFACE -lc
+            INTERFACE -lm)
 
     # Configure the compile & linked options for the MCU declared in find_package(STM32Cube COMPONENTS <MCU>)
-    target_compile_options(${target} PUBLIC ${STM32_COMPILE_OPTIONS})
-    target_link_options(${target} PUBLIC ${STM32_LINK_OPTIONS})
+    target_compile_options(${target} INTERFACE ${STM32_COMPILE_OPTIONS})
+    target_link_options(${target} INTERFACE ${STM32_LINK_OPTIONS})
 endfunction()
 
 # Configure the executable target by doing the following operation depending on whether the CMSIS and/or HAL are linked:
@@ -95,16 +95,12 @@ function(stm32_configure_executable target)
 
     # Configure the CMSIS if find_package(CMSIS) has been called and the CMSIS has been found.
     if (${CMSIS_FOUND} EQUAL 1)
-        # Add compile options for the assembler startup script.
-        # FIXME set_source_files_properties(${STM32_STARTUP_SOURCE} PROPERTIES COMPILE_OPTIONS "-x assembler-with-cpp")
-
-        # Include headers from the CMSIS
-        target_include_directories(${target} PUBLIC ${CMSIS_INCLUDE_DIRS})
+        target_link_libraries(${PROJECT_NAME} ${CMSIS_TARGET})
     endif ()
 
     # Configure the HAL if find_package(HAL) has been called and the HAL has been found.
     if (${HAL_FOUND} EQUAL 1)
         target_compile_definitions(${target} PUBLIC "USE_HAL_DRIVER")
-        target_include_directories(${target} PUBLIC ${HAL_INCLUDE_DIRS})
+        target_link_libraries(${PROJECT_NAME} ${HAL_TARGET})
     endif ()
 endfunction()
