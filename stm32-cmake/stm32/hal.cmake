@@ -35,6 +35,8 @@ function(stm32_configure_hal_config target)
 
     if (STM32_HAL_CONFIG_FILE)
         message(STATUS "Found existing HAL configuration ${STM32_HAL_CONFIG_FILE}")
+
+        cmake_path(GET MYPROJECT_DIR PARENT_PATH PARENT_DIR)
     else ()
         stm32_copy_hal_from_template(${target})
         message(STATUS "Using template HAL configuration generated at ${STM32_HAL_CONFIG_FILE}")
