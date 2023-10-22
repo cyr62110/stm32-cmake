@@ -19,11 +19,11 @@ set(HAL_CONFIG_FILENAME "${STM32_MCU_SERIES_L}_hal_conf.h")
 file(GLOB HAL_SOURCES "${HAL_ROOT_DIR}/Src/*.c")
 list(FILTER HAL_SOURCES EXCLUDE REGEX "^.*_template\.c$")
 
-add_library(${HAL_TARGET} INTERFACE ${HAL_SOURCES})
-target_include_directories(${HAL_TARGET} INTERFACE "${HAL_ROOT_DIR}/Inc")
+add_library(${HAL_TARGET} ${HAL_SOURCES})
+target_include_directories(${HAL_TARGET} PUBLIC "${HAL_ROOT_DIR}/Inc")
 
-target_link_libraries(${HAL_TARGET} INTERFACE ${CMSIS_TARGET})
+target_link_libraries(${HAL_TARGET} PUBLIC ${CMSIS_TARGET})
 
-stm32_configure_target(${HAL_TARGET} INTERFACE)
+stm32_configure_target(${HAL_TARGET} PUBLIC)
 
 set(HAL_FOUND 1)

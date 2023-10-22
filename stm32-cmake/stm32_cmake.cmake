@@ -100,7 +100,7 @@ function(stm32_configure_executable target)
 
     # Configure the HAL if find_package(HAL) has been called and the HAL has been found.
     if (${HAL_FOUND} EQUAL 1)
-        stm32_configure_hal_config(${HAL_TARGET} INTERFACE)
+        stm32_configure_hal_config(${HAL_TARGET} PUBLIC)
         target_link_libraries(${target} ${HAL_TARGET})
     endif ()
 endfunction()
